@@ -1,0 +1,8 @@
+name: 'Ckeditor Allowed Content Rules'
+type: module
+description: 'Allow to override default ckeditor with advance rules'
+core_version_requirement: ^8 || ^9
+core: '8.x'
+package: Ckeditor
+dependencies:
+  - drupal:ckeditor

@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Provides UI to manage CKEditor configuration.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function ckeditor_acr_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.ckeditor_acr':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('CKEditor Allowed Content Rules allows you to override Drupal default "Limit allowed HTML tags and correct faulty HTML" editor configuration with CKEditor Allowed Content Rules.') . '</p>';
+      $output .= '<p>' . t('See <a href="@url">Allowed Content Rules</a> for configuration options.', ['@url' => 'https://ckeditor.com/docs/ckeditor4/latest/guide/dev_allowed_content_rules.html']) . '</p>';
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Adding configuration to an editor') . '</dt>';
+      $output .= '<dd>';
+      $output .= '<p>' . t('Navigate to an editor configuration page (/admin/config/content/formats/manage/[editor]).') . '</p>';
+      $output .= '<p>' . t('On the configuration page, navigate to <em>CKEditor Allowed Content Rules Override</em> under <em>CKEditor plugin settings</em>.') . '</p>';
+      $output .= '<p>' . t('Override rules with each item on its own line.') . '</p>';
+      $output .= '<p>';
+      $output .= t('Examples:<br>');
+      $output .= t('<code>img[alt,!src]{width,height}</code><br>');
+      $output .= t('<code>a[!href]</code>');
+      $output .= '</p>';
+      $output .= '</dd>';
+      $output .= '</dl>';
+
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_editor_js_settings_alter().
+ */
+function ckeditor_acr_editor_js_settings_alter(array &$settings) {
+  foreach ($settings['editor']['formats'] as &$editor) {
+    if (isset($editor['editorSettings']['ckeditor_acr_rules'])) {
+      // Loop through custom config values and set/override settings.
+      foreach ($editor['editorSettings']['ckeditor_acr_rules'] as $tag => $rules) {
+        // Override settings.
+        $editor['editorSettings']['allowedContent'][$tag] = $rules;
+      }
+    }
+    // Settings have been copied to 'editorSettings' and can now be removed.
+    unset($editor['editorSettings']['ckeditor_acr_rules']);
+  }
+}
