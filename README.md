@@ -18,6 +18,8 @@ https://www.drupal.org/docs/8/extending-drupal-8/installing-drupal-8-modules
 Adding configuration to an editor
 1) Navigate to an editor configuration page 
 (/admin/config/content/formats/manage/[editor]).
+2) Please ensure you have enabled <i>"Limit allowed HTML tags and correct faulty 
+HTML"</i> filter for this setting to take effect.
 2) On the configuration page, navigate to 
 "CKEditor Allowed Content Rules Override" under "CKEditor plugin settings".
 Override rules with each item on its own line.

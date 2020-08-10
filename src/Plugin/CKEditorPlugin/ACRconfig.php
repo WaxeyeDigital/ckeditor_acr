@@ -64,19 +64,35 @@ class ACRconfig extends CKEditorPluginBase implements CKEditorPluginConfigurable
       $element_config = [];
       foreach ($config_array as $conf) {
 
-        // @todo Implement better approach for getting rules.
-        // Get tag name.
-        preg_match("/^([a-z0-9\-*\s]+)/i", $conf, $tag);
-        $tag = isset($tag[1]) ? $tag[1] : '';
-        // Get attribute string.
-        preg_match("/\[(.*?)\]/", $conf, $attrib);
-        $attributes = isset($attrib[1]) ? $attrib[1] : FALSE;
-        // Get styles string.
-        preg_match("/{(.*?)}/", $conf, $styles);
-        $styles = isset($styles[1]) ? $styles[1] : FALSE;
-        // Get classes string.
-        preg_match("/\((.*?)\)/", $conf, $classes);
-        $classes = isset($classes[1]) ? $classes[1] : FALSE;
+        // Regex expression match string as following
+        // <element> [attribute] {style} (classes)
+        preg_match_all("/(?:(?i)^([a-z0-9\-*\s]+))|(?:\[(.*?)\])|(?:{(.*?)})|(?:\((.*?)\))/", $conf, $rules_array, PREG_PATTERN_ORDER);
+        // Unset first index as it content separators.
+        array_shift($rules_array);
+
+        foreach ($rules_array as $index => $rule) {
+          switch ($index) {
+            case 0:
+              // Index zero is element.
+              $tag = $this->getRuleString($rule);
+              break;
+
+            case 1:
+              // Index one is attribute.
+              $attributes = $this->getRuleString($rule);
+              break;
+
+            case 2:
+              // Index two is style.
+              $styles = $this->getRuleString($rule);
+              break;
+
+            case 3:
+              // Index three is classes.
+              $classes = $this->getRuleString($rule);
+              break;
+          }
+        }
 
         // Create config array for each element.
         if ($tag) {
@@ -87,10 +103,8 @@ class ACRconfig extends CKEditorPluginBase implements CKEditorPluginConfigurable
           ];
         }
       }
-
       $config['ckeditor_acr_rules'] = $element_config;
     }
-
     return $config;
   }
 
@@ -109,10 +123,27 @@ class ACRconfig extends CKEditorPluginBase implements CKEditorPluginConfigurable
       '#type' => 'textarea',
       '#title' => $this->t('CKEditor Allowed Content Rules Override'),
       '#default_value' => $config['ckeditor_acr_config'],
-      '#description' => $this->t('Each line may contain a CKeditor Allowed Content Rules configuration setting formatted as "<code>img[alt,!src]{width,height}</code>" A rule accepting img tag with a required "src" attribute and an optional "alt" attribute plus optional "width" and "height" styles. See <a href="@url">Allowed Content Rules</a> for more details.', ['@url' => 'https://ckeditor.com/docs/ckeditor4/latest/guide/dev_allowed_content_rules.html']),
+      '#description' => $this->t('Each line may contain a CKeditor Allowed Content Rules configuration setting formatted as "<code>img[alt,!src]{width,height}</code>" A rule accepting img tag with a required "src" attribute and an optional "alt" attribute plus optional "width" and "height" styles. See <a href="@url">Allowed Content Rules</a> for more details.<br><strong>(Note:- Please ensure you have enabled <i>"Limit allowed HTML tags and correct faulty HTML"</i> filter for this setting to take effect.) </strong>', ['@url' => 'https://ckeditor.com/docs/ckeditor4/latest/guide/dev_allowed_content_rules.html']),
     ];
 
     return $form;
+  }
+
+  /**
+   * Get rule string from array.
+   *
+   * @param array $rule
+   *   Array of match.
+   *
+   * @return bool|mixed
+   *   Return rule string or FALSE.
+   */
+  protected function getRuleString(array $rule) {
+    $rule = array_values(array_filter($rule));
+    if (!empty($rule)) {
+      return isset($rule[0]) ? $rule[0] : FALSE;
+    }
+    return FALSE;
   }
 
 }
