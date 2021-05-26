@@ -41,7 +41,7 @@ function ckeditor_acr_help($route_name, RouteMatchInterface $route_match) {
  */
 function ckeditor_acr_editor_js_settings_alter(array &$settings) {
   foreach ($settings['editor']['formats'] as &$editor) {
-    if (isset($editor['editorSettings']['ckeditor_acr_rules'])) {
+    if (isset($editor['editorSettings']['ckeditor_acr_rules']) && is_array($editor['editorSettings']['allowedContent'])) {
       // Loop through custom config values and set/override settings.
       foreach ($editor['editorSettings']['ckeditor_acr_rules'] as $tag => $rules) {
         // Override settings.
