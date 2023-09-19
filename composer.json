@@ -1,0 +1,10 @@
+{
+  "name": "drupal/ckeditor_acr",
+  "type": "drupal-module",
+  "description": "Ckeditor Allowed Content Rules",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "http://drupal.org/project/ckeditor_acr",
+  "minimum-stability": "dev",
+  "require": { }
+}
